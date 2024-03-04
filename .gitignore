@@ -5,3 +5,6 @@
 .coverage
 __pycache__/
 coverage.xml
+php/vendor
+composer.json
+composer.lock
