@@ -32,11 +32,7 @@ class NodeTree:
                 self.root.right = Node(value)
                 self.size += 1
                 self.height = 1 if self.height == 0 else self.height
-    
 
-
-
-    
     def _recursive_insert(self, node: Node, value: int, current_depth: int) -> None:
         if self.height < current_depth:
             self.height = current_depth
@@ -55,9 +51,6 @@ class NodeTree:
                 node.right = Node(value)
                 self.size += 1
 
-
-
-
     def search(self, value: int) -> bool:
         if self.root.value == value:
             return True
@@ -71,7 +64,6 @@ class NodeTree:
                 return self._recursive_search(self.root.right, value)
             else:
                 return False
-
 
     def _recursive_search(self, node: Node, value: int) -> bool:
         if node.value == value:
@@ -87,12 +79,10 @@ class NodeTree:
             else:
                 return False
 
-
     def in_order_traversal(self) -> list[int]:
         in_order_list = []
         self._recursive_in_order_traversal(self.root, in_order_list)
         return in_order_list
-
 
     def _recursive_in_order_traversal(self, node: Node, in_order_list: list):
         if node.left != None:
@@ -100,7 +90,6 @@ class NodeTree:
         in_order_list.append(node.value)
         if node.right != None:
             self._recursive_in_order_traversal(node.right, in_order_list)
-
 
     def find_min(self) -> int:
         current_node = self.root
@@ -124,7 +113,6 @@ class NodeTree:
         if current_node.right != None:
             self._recursive_count_leaves(current_node.right, leaves_list)
         return len(leaves_list)
-
 
     def _recursive_count_leaves(self, node: Node, leaves_list: list):
         if node.left == None and node.right == None:
@@ -152,13 +140,15 @@ class NodeTree:
         if node.right != None:
             self._recursive_serialize(node.right, dict_order)
 
-
-    
     def deserialize(self, tree: str) -> None:
         self.root = None
         for value in tree.split(","):
             self.insert(int(value))
         return self
+
+    
+    
+    
 
 
     # Used Chat GPT to help with this one...I had no idea how to do it. 
