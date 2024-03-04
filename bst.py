@@ -1,5 +1,3 @@
-import pytest
-
 class Node:
     def __init__(self, value):
         self.value = value
@@ -212,6 +210,30 @@ class NodeTree:
         while(current.left is not None):
             current = current.left
         return current
+    
+    def balance_tree(self):
+        # Step 1: Get sorted nodes
+        sorted_nodes = self.in_order_traversal()
+
+        # Step 2: Rebuild the tree from the sorted nodes
+        self.root = self._build_balanced_tree(sorted_nodes, 0, len(sorted_nodes) - 1)
+
+    def _build_balanced_tree(self, sorted_nodes, start, end):
+        # Base case
+        if start > end:
+            return None
+
+        # get the middle element and make it root
+        mid = (start + end) // 2
+        node = Node(sorted_nodes[mid])
+
+        # Recursively construct the left subtree and make it left child of root
+        node.left = self._build_balanced_tree(sorted_nodes, start, mid - 1)
+
+        # Recursively construct the right subtree and make it right child of root
+        node.right = self._build_balanced_tree(sorted_nodes, mid + 1, end)
+
+        return node
 
 
     

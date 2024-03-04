@@ -59,3 +59,33 @@ def test_delete(full_tree):
     assert full_tree.search(10) == False
     assert full_tree.serialize() == "5,2,3,7,8"
 
+def test_balance_tree(full_tree):
+    def check_balanced(node):
+        """
+        Helper function to cvheck if a tree is balanced.
+        Returns a tuple (is_balanced, hjeight) for each subtree.
+        """
+        if node is None:
+            return True, 0 # Base case: Empty trees are balanced and have height 0.
+
+        # Check subtrees recursively
+        left_balanced, left_height = check_balanced(node.left)
+        right_balanced, right_height = check_balanced(node.right)
+
+        # A tree is balanced if both subtrees are balanced and their heights deffer
+        # by no more than 1
+        is_balanced = left_balanced and right_balanced and abs(left_height - right_height) <= 1
+
+        height = max(left_height, right_height) + 1
+
+        return is_balanced, height
+    
+    for value in [1,11,12,13,14,16,6,20]:
+        full_tree.insert(value)
+    
+    # Balance the tree
+    full_tree.balance_tree()
+
+    # Check if the tree is now balanced
+    is_balanced, _ = check_balanced(full_tree.root)
+    assert is_balanced
