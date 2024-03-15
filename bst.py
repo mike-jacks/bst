@@ -1,3 +1,6 @@
+from typing import Self
+
+
 class Node:
     def __init__(self, value):
         self.value = value
@@ -140,11 +143,18 @@ class NodeTree:
         if node.right != None:
             self._recursive_serialize(node.right, dict_order)
 
-    def deserialize(self, tree: str) -> None:
-        self.root = None
-        for value in tree.split(","):
-            self.insert(int(value))
+    def deserialize(self,serialize_str: str, node: Node = None, ) -> Self:
+        if node is None:
+            node = self.root
+        searialized_str_iter_object = iter(map(lambda x: int(x), serialize_str.split(",")))
+        new_bst = NodeTree()
+        while (current_value := next(searialized_str_iter_object, None)) != None:
+            new_bst.insert(current_value)
+        self.root = new_bst.root
         return self
+            
+
+        
 
     
     
