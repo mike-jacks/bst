@@ -78,7 +78,7 @@ def test_deserialize(full_tree: NodeTree):
 
 
 # Used chat GPT for the following two tests and builds in Node Tree.
-def test_delete(full_tree):
+def test_delete(full_tree: NodeTree):
     assert full_tree.search(10) == True
     assert full_tree.serialize() == "5,2,3,7,10,8"
     full_tree.delete(10)

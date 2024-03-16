@@ -153,94 +153,48 @@ class NodeTree:
         return self
             
 
+    # Recreated my delete function at home after working on it with Gabe on his BST project earlier in the day
         
-
-    
-    
-    
-
-
-    # Used Chat GPT to help with this one...I had no idea how to do it. 
     def delete(self, value: int):
-        self.root = self._delete(self.root, value)
-
-    def _delete(self, node, value) -> Node:
-        # Base case
-        if node is None:
-            return node
-
-        # If the value to be deleted is smaller than the node's value,
-        # then it lies in the left subtree
-        if value < node.value:
-            node.left = self._delete(node.left, value)
-
-        # If the key to be ddeleted is greater than the node's,
-        # then it lies in the right subtree
-        elif(value > node.value):
-            node.right = self._delete(node.right, value)
-
-        # If key is same as root's key, then this is the node to be deleted
-        else:
-            # Node with only one child or no child
-            if node.left is None:
-                temp = node.right
-                node = None
-                return temp
-            elif node.right is None:
-                temp = node.left
-                node = None
-                return temp
-
-            # Node with two childeren:
-            # Get the inorder successor (smallest in the right subtree)
-            temp = self._min_value_node(node.right)
-
-            # Copy the inorder successor's content to this node
-            node.value = temp.value
-
-            # Delete the inorder successor
-            node.right = self._delete(node.right, temp.value)
-
-        return node
-
-    def _min_value_node(self, node):
-        current = node
-        # loop down to find the left most leaf
-        while(current.left is not None):
-            current = current.left
-        return current
+        serialized_bst_str = self.serialize()
+        serialized_bst_str = "".join(serialized_bst_str.split("," + str(value)))
+        self.root = self.deserialize(serialized_bst_str).root
+    
+    # Recreated my balance tree function at home after working on it with Gabe on his BST project earlier in the day
     
     def balance_tree(self):
-        # Step 1: Get sorted nodes
-        sorted_nodes = self.in_order_traversal()
+        def _rec_balance_tree(sub_list: list[int]):
+            if len(sub_list) == 1:
+                balance_tree_list.append(sub_list[0])
+                return
+            if len(sub_list) == 2:
+                balance_tree_list.append(sub_list[0])
+                balance_tree_list.append(sub_list[1])
+                return
+            mid_index = len(sub_list) // 2
+            mid_value = sub_list[mid_index]
+            left_list = sub_list[:mid_index]
+            right_list = sub_list[mid_index+1:]
+            balance_tree_list.append(mid_value)
+            _rec_balance_tree(left_list)
+            _rec_balance_tree(right_list)
+            
+            
+        balance_tree_list = []
+        bst_in_order = self.in_order_traversal()
+        length = len(bst_in_order)
+        if length <= 2:
+            return
+        mid_index = length // 2
+        mid_value = bst_in_order[mid_index]
+        left_list = bst_in_order[:mid_index]
+        right_list = bst_in_order[mid_index+1:]
+        balance_tree_list.append(mid_value)
+        _rec_balance_tree(left_list)
+        _rec_balance_tree(right_list)
 
-        # Step 2: Rebuild the tree from the sorted nodes
-        self.root = self._build_balanced_tree(sorted_nodes, 0, len(sorted_nodes) - 1)
+        new_bst = NodeTree()
+        for value in balance_tree_list:
+            new_bst.insert(value)
+        self.root = new_bst.root       
 
-    def _build_balanced_tree(self, sorted_nodes, start, end):
-        # Base case
-        if start > end:
-            return None
-
-        # get the middle element and make it root
-        mid = (start + end) // 2
-        node = Node(sorted_nodes[mid])
-
-        # Recursively construct the left subtree and make it left child of root
-        node.left = self._build_balanced_tree(sorted_nodes, start, mid - 1)
-
-        # Recursively construct the right subtree and make it right child of root
-        node.right = self._build_balanced_tree(sorted_nodes, mid + 1, end)
-
-        return node
-
-
-    
-
-
-
-
-
-    
-
-       
