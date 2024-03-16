@@ -65,6 +65,7 @@ class NodeTreeTest extends TestCase {
 
         $tree->delete(5);
         $this->assertFalse($tree->search(5));  // 5 should be deleted
+        echo $tree->serialize();
         $this->assertTrue($tree->search(7));   // 7 should still exist
     }
 

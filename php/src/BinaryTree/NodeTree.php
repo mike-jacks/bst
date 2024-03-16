@@ -15,54 +15,56 @@ class NodeTree {
         if ($this->root == null) {
             $this->root = new Node($value);
             $this->size += 1;
-            return null;
+            return;
         }
-        if ($value == $this->root->value) {
-            return null;
-        }
-        if ($value < $this->root->value) {
+        if ($value === $this->root->value) {
+            return;
+        } else if ($value < $this->root->value) {
             if ($this->root->left != null) {
-               return $this->_recursive_insert($this->root->left, $value, 2); 
+                $this->_recursive_insert($this->root->left, $value, $this->height+1);
             } else {
                 $this->root->left = new Node($value);
                 $this->size += 1;
-                $this->height = ($this->height === 0) ? 1 : $this->height;
+                if ($this->height === 0) {
+                    $this->height = 1;
+                }
             }
-        }
-        else {
+        } else if ($value > $this->root->value) {
             if ($this->root->right != null) {
-                return $this->_recursive_insert($this->root->right, $value, 2);
+                $this->_recursive_insert($this->root->right, $value, $this->height+ 1);
             } else {
                 $this->root->right = new Node($value);
                 $this->size += 1;
-                $this->height = ($this->height === 0) ? 1 : $this->height;
+                if ($this->height === 0) {
+                    $this->height = 1;
+                }
             }
         }
     }
 
-    private function _recursive_insert(Node $node, int $value, int $current_depth) {
-        $this->height = ($this->height < $current_depth) ? $current_depth : $this->height;
-        if ($value == $node->value) {
-            return null;
+    private function _recursive_insert(Node $node, int $value, int $current_height) {
+        if ($current_height > $this->height) {
+            $this->height = $current_height;
         }
-        if ($value < $node->value) {
-            if ($node->left !== null) {
-                return $this->_recursive_insert($node->left, $value, $current_depth + 1);
+        if ($node->value === $value) {
+            return;
+        } else if ($value < $node->value) {
+            if ($node->left != null) {
+                $this->_recursive_insert($node->left, $value, $current_height + 1);
             } else {
                 $node->left = new Node($value);
                 $this->size += 1;
-                return null;
             }
-        } else {
-            if ($node->right !== null) {
-                return $this->_recursive_insert($node->right, $value, $current_depth + 1);
+        } else if ($value > $node->value) {
+            if ($node->right != null) {
+                $this->_recursive_insert($node->right, $value, $current_height + 1);
             } else {
                 $node->right = new Node($value);
                 $this->size += 1;
-                return null;
             }
         }
     }
+    
 
 
     public function search(int $value): bool{
@@ -152,96 +154,62 @@ class NodeTree {
     private function _recursive_count_leaves(?Node $node, array $leaves_list): array {
         if ($node->left === null AND $node->right === null) {
             $leaves_list[] = $node;
-        }
-        if ($node->left !== null) {
-            $this->_recursive_count_leaves($node->left, $leaves_list);
-        }
-        if ($node->right !== null) {
-            $this->_recursive_count_leaves($node->right, $leaves_list);
+        } else {
+            if ($node->left !== null) {
+                $leaves_list = $this->_recursive_count_leaves($node->left, $leaves_list);
+            }
+            if ($node->right !== null) {
+                $leaves_list = $this->_recursive_count_leaves($node->right, $leaves_list);
+            }
         }
         return $leaves_list;
     }
 
     public function serialize(): string {
+        
         $current = $this->root;
-        $dict_order = [];
-        $dict_order["$current->value"] = $current->value;
+        $pre_order_list = [$current->value];
         if ($current->left !== null) {
-            $dict_order = $this->_recursive_serialize($current->left, $dict_order);
+            $pre_order_list = $this->_recursive_serialize($current->left, $pre_order_list);
         }
         if ($current->right !== null) {
-            $dict_order = $this->_recursive_serialize($current->right, $dict_order);
+            $pre_order_list = $this->_recursive_serialize($current->right, $pre_order_list);
         }
-        $string = implode(",", array_keys($dict_order));
+        $string = implode(",",$pre_order_list);
         return $string;
     }
-
-    private function _recursive_serialize(?Node $node, array $dict_order): array {
-        $dict_order["$node->value"] = $node->value;
-        if ($node->left !== null) {
-            return $this->_recursive_serialize($node->left, $dict_order);
-        } if ($node->right !== null) {
-            return $this->_recursive_serialize($node->right, $dict_order);
+    private function _recursive_serialize(?Node $node, array $pre_order_list): array {
+            $pre_order_list[] = $node->value;
+            if ($node->left !== null) {
+                $pre_order_list = $this->_recursive_serialize($node->left, $pre_order_list);
+            } if ($node->right !== null) {
+                $pre_order_list = $this->_recursive_serialize($node->right, $pre_order_list);
+            }
+            return $pre_order_list;
         }
-        return $dict_order;
-    }
-
-    public function deserialize(string $tree) {
-        $this->root = null;
-        foreach (explode(",", $tree) as $value) {
-            $this->insert((int)$value);
+    public function deserialize(string $serialize_str, Node $node = null): self{
+        if ($node === null) {
+            $node = $this->root;
         }
+        $serialized_int_array = array_map('intVal', explode(',', $serialize_str));
+        $new_bst = new NodeTree();
+        foreach ($serialized_int_array as $value) {
+            $new_bst->insert($value);
+        }
+        $this->root = $new_bst->root;
         return $this;
     }
     
 
 
     public function delete(int $value) {
-        $this->root = $this->_recursive_delete($this->root, $value);
-    }
-
-    private function _recursive_delete(?Node $node, int $value): ?Node {
-        // Base case
-        if ($node === null) {
-            return $node;
-        }
-
-        // If the value to be deleted is smaller than the node's value,
-        // then it lies in the left subtree
-        if ($value < $node->value) {
-            $node->left = $this->_recursive_delete($node->left, $value);
-        }
-
-        // If the value to be deleted is greater than the node's,
-        // then it lies in the right subtree
-        if ($value > $node->value) {
-            $node->right = $this->_recursive_delete($node->right, $value);
-        }
-
-        // If value is same as node's value, then this is the node to be deleted
-        else {
-            // Node with only one child or no child
-            if ($node->left === null) {
-                $temp = $node->right;
-                $node = null;
-                return $temp;
-            } elseif ($node->right === null) {
-                $temp = $node->left;
-                $node = null;
-                return $temp;
-            }
-
-            // Node with two children:
-            // Get the inorder successor (smallest in the right subtree)
-            $temp = $this->_min_value_node($node->right);
-
-            // Copy the inorder successor's content to this node
-            $node->value = $temp->value;
-
-            // Delete the inorder successor
-            $node->right = $this->_recursive_delete($node->right, $temp->value);
-        }
-        return $node;
+        $serialized_bst_str = $this->serialize();
+        $parts = explode((string)$value, $serialized_bst_str);
+        $parts_without_value = array_filter(array_map(function($part) {
+            return trim($part,",");
+        }, $parts));
+        $reconstructedStr = trim(implode(",", $parts_without_value), ",");
+        $this->root = $this->deserialize($reconstructedStr)->root;
     }
 
     private function _min_value_node(?Node $node) {
@@ -282,10 +250,14 @@ class NodeTree {
 }
 
 $tree = new NodeTree();
-$tree->insert(5);
-$tree->insert(7);
+$tree->insert(4);
 $tree->insert(2);
+$tree->insert(7);
+$tree->insert(1);
 $tree->insert(3);
+$tree->insert(5);
 $tree->insert(10);
-$tree->insert(8);
-$tree->balance_tree();
+$tree->insert(15);
+echo $tree->serialize(), "\n";
+$tree->delete(5);
+echo $tree->serialize(),"\n";
