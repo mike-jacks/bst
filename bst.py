@@ -157,7 +157,7 @@ class NodeTree:
         
     def delete(self, value: int):
         serialized_bst_str = self.serialize()
-        serialized_bst_str = "".join(serialized_bst_str.split("," + str(value)))
+        serialized_bst_str = ",".join(map(lambda x: x.strip(","), serialized_bst_str.split(str(value)))).strip(",")
         self.root = self.deserialize(serialized_bst_str).root
     
     # Recreated my balance tree function at home after working on it with Gabe on his BST project earlier in the day
