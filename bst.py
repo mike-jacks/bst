@@ -127,21 +127,20 @@ class NodeTree:
 
     def serialize(self) -> str:
         current = self.root
-        dict_order = {}
-        dict_order[str(current.value)] = current.value
+        pre_order_list = [current.value]
         if current.left != None:
-            self._recursive_serialize(current.left, dict_order)
+            self._recursive_serialize(current.left, pre_order_list)
         if current.right != None:
-            self._recursive_serialize(current.right, dict_order)
-        string = ",".join(iter(dict_order.keys()))
+            self._recursive_serialize(current.right, pre_order_list)
+        string = ",".join(map(str, pre_order_list))
         return string
 
-    def _recursive_serialize(self, node: Node, dict_order: dict):
-        dict_order[str(node.value)] = node.value
+    def _recursive_serialize(self, node: Node, pre_order_list: list):
+        pre_order_list.append(node.value)
         if node.left != None:
-            self._recursive_serialize(node.left, dict_order)
+            self._recursive_serialize(node.left, pre_order_list)
         if node.right != None:
-            self._recursive_serialize(node.right, dict_order)
+            self._recursive_serialize(node.right, pre_order_list)
 
     def deserialize(self,serialize_str: str, node: Node = None, ) -> Self:
         if node is None:
