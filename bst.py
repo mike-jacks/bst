@@ -21,16 +21,16 @@ class NodeTree:
             return
         if value == self.root.value:
             return
-        if value < self.root.value: 
+        elif value < self.root.value: 
             if self.root.left != None:
-                return self._recursive_insert(self.root.left, value, 2)
+                self._recursive_insert(self.root.left, value, 1)
             else:
                 self.root.left = Node(value)
                 self.size += 1
                 self.height = 1 if self.height == 0 else self.height
-        else:
+        elif value > self.root.value:
             if self.root.right != None:
-                return self._recursive_insert(self.root.right, value, 2)
+                self._recursive_insert(self.root.right, value, 1)
             else:
                 self.root.right = Node(value)
                 self.size += 1
@@ -41,18 +41,20 @@ class NodeTree:
             self.height = current_depth
         if value == node.value:
             return
-        if value < node.value:
+        elif value < node.value:
             if node.left != None:
-                return self._recursive_insert(node.left, value, current_depth + 1)
+                self._recursive_insert(node.left, value, current_depth + 1)
             else:
                 node.left = Node(value)
                 self.size += 1
-        else:
+                self.height += 1 if self.height == current_depth  else 0
+        elif value > node.value:
             if node.right != None:
-                return self._recursive_insert(node.right, value, current_depth + 1)
+                self._recursive_insert(node.right, value, current_depth + 1)
             else:
                 node.right = Node(value)
                 self.size += 1
+                self.height += 1 if self.height == current_depth  else 0
 
     def search(self, value: int) -> bool:
         if self.root.value == value:
@@ -157,7 +159,7 @@ class NodeTree:
         
     def delete(self, value: int):
         serialized_bst_str = self.serialize()
-        if value in [value for value in serialized_bst_str.split(",")]: 
+        if value in [int(value) for value in serialized_bst_str.split(",")]: 
             serialized_bst_str = ",".join(map(lambda x: x.strip(","), serialized_bst_str.split(str(value)))).strip(",")
             self.root = self.deserialize(serialized_bst_str).root
             self.size -= 1
