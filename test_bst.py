@@ -40,7 +40,7 @@ def test_find_max(full_tree: NodeTree):
     assert full_tree.find_max() == 10
 
 def test_get_height(full_tree: NodeTree):
-    assert full_tree.height == 3
+    assert full_tree.height == 4
 
 def test_count_leaves(full_tree: NodeTree):
     assert full_tree.count_leaves() == 2
@@ -115,3 +115,28 @@ def test_balance_tree(full_tree: NodeTree):
     # Check if the tree is now balanced
     is_balanced, _ = check_balanced(full_tree.root)
     assert is_balanced
+
+def test_height(empty_tree: NodeTree):
+    assert empty_tree.height == 0
+    empty_tree.insert(5)
+    assert empty_tree.height == 1
+    empty_tree.delete(5)
+    assert empty_tree.height == 0
+    empty_tree.insert(5)
+    assert empty_tree.height == 1
+    empty_tree.insert(4)
+    assert empty_tree.height == 2
+    empty_tree.insert(6)
+    assert empty_tree.height == 2
+    empty_tree.insert(2)
+    assert empty_tree.height == 3
+    empty_tree.insert(1)
+    assert empty_tree.height == 4
+    empty_tree.delete(1)
+    assert empty_tree.height == 3
+    empty_tree.delete(4)
+    empty_tree.delete(6)
+    empty_tree.delete(2)
+    assert empty_tree.height == 1
+    empty_tree.delete(5)
+    assert empty_tree.height == 0

@@ -18,25 +18,27 @@ class NodeTree:
         if self.root == None:
             self.root = Node(value)
             self.size += 1
+            self.height += 1
             return
         if value == self.root.value:
             return
         elif value < self.root.value: 
             if self.root.left != None:
-                self._recursive_insert(self.root.left, value, 1)
+                self._recursive_insert(self.root.left, value, 2)
             else:
                 self.root.left = Node(value)
                 self.size += 1
-                self.height = 1 if self.height == 0 else self.height
+                self.height = 2 if self.height == 1 else self.height
         elif value > self.root.value:
             if self.root.right != None:
-                self._recursive_insert(self.root.right, value, 1)
+                self._recursive_insert(self.root.right, value, 2)
             else:
                 self.root.right = Node(value)
                 self.size += 1
-                self.height = 1 if self.height == 0 else self.height
+                self.height = 2 if self.height == 1 else self.height
 
     def _recursive_insert(self, node: Node, value: int, current_depth: int) -> None:
+        print(current_depth)
         if self.height < current_depth:
             self.height = current_depth
         if value == node.value:
@@ -128,6 +130,8 @@ class NodeTree:
             self._recursive_count_leaves(node.right, leaves_list)
 
     def serialize(self) -> str:
+        if self.root == None:
+            return ""
         current = self.root
         pre_order_list = [current.value]
         if current.left != None:
@@ -145,6 +149,12 @@ class NodeTree:
             self._recursive_serialize(node.right, pre_order_list)
 
     def deserialize(self,serialize_str: str, node: Node = None, ) -> Self:
+        if serialize_str == "":
+            new_bst = NodeTree()
+            self.root = new_bst.root
+            self.size = new_bst.size
+            self.height = new_bst.height
+            return self
         if node is None:
             node = self.root
         searialized_str_iter_object = iter(map(lambda x: int(x), serialize_str.split(",")))
@@ -164,7 +174,8 @@ class NodeTree:
         serialized_bst_as_list_of_ints = [int(v) for v in serialized_bst_str.split(",")]
         if value in [v for v in serialized_bst_as_list_of_ints]: 
             serialized_bst_str = ",".join(map(str, filter(lambda x: x != value, serialized_bst_as_list_of_ints)))
-            self.root = self.deserialize(serialized_bst_str).root
+            self = self.deserialize(serialized_bst_str)
+            print(serialized_bst_str)
     
     # Recreated my balance tree function at home after working on it with Gabe on his BST project earlier in the day
     
@@ -203,28 +214,3 @@ class NodeTree:
         for value in balance_tree_list:
             new_bst.insert(value)
         self.root = new_bst.root       
-
-new_tree = NodeTree()
-print(f"height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(4)
-print(f"insert: 4, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(2)
-print(f"insert: 2, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(7)
-print(f"insert: 7, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(1)
-print(f"insert: 1, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(3)
-print(f"insert: 3, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(10)
-print(f"insert: 10, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.insert(15)
-print(f"insert: 15, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.delete(2)
-print(f"delete: 2, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.delete(1)
-print(f"delete: 1, height: {new_tree.height}, size: {new_tree.size}")
-new_tree.delete(15)
-print(f"delete: 15, height: {new_tree.height}, size: {new_tree.size}")
-print(new_tree.serialize())
-
